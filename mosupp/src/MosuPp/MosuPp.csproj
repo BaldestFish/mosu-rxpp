@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net6.0</TargetFrameworks>
+    <LangVersion>10.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <RootNamespace>MosuPp</RootNamespace>
+    <AssemblyName>MosuPp</AssemblyName>
+    <Version>4.0.1</Version>
+    <Description>MosuPp: Relax PP system based on a C# port of rosu-pp 4.0.1 (osu!standard): .osu parsing, star rating and performance points, including Relax.</Description>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <!-- Integer wrap-around must behave like rosu-pp (Rust release builds). -->
+    <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="MosuPp.Tests" />
+  </ItemGroup>
+
+</Project>
