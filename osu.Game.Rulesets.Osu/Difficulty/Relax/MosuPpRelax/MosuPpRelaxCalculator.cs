@@ -18,9 +18,9 @@ using osu.Game.Utils;
 namespace osu.Game.Rulesets.Osu.Difficulty.Relax.MosuPpRelax
 {
     /// <summary>
-    /// MosuPp RX calculator: an exact, self-contained copy of the MosuPp development calculator (MosuPp v15 —
-    /// Realistik core + all MosuPp rules), used only when the Relax PP system is MosuPp. The "Mosu" system keeps
-    /// using the Realistik calculator in Relax/Realistik; nothing here is shared with it.
+    /// MosuPp RX calculator: an exact, self-contained copy of the MosuPp development calculator (Realistik core +
+    /// all MosuPp rules), used only when the Relax PP system is MosuPp. The "Mosu" system keeps using the Realistik
+    /// calculator in Relax/Realistik; nothing here is shared with it.
     /// </summary>
     internal static class MosuPpRelaxCalculator
     {
@@ -125,6 +125,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Relax.MosuPpRelax
 
                     // MosuPp "Point Variety Nerf (RX)": 2–4 spot back-and-forth spam loses most aim/speed PP.
                     RxPointVarietyNerf.Apply(result, beatmap);
+
+                    // MosuPp "Extreme Jump Nerf (RX)": maps with 80+ jumps faster than 4.5 px/ms (glass beach) lose up to 31% aim PP.
+                    RxExtremeJumpNerf.Apply(result, beatmap);
                 }
 
                 result.Pp = RealistikRelaxBalance.RebuildTotal(result, scoreState, nativeMultiplier);
@@ -145,39 +148,40 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Relax.MosuPpRelax
 
                 double odMultiplier = RealistikRelaxBalance.OdMultiplier(result.Difficulty.Od);
 
-                // MosuPp = Realistik + "CS PP Buff (RX)". The playable beatmap's CS already includes HR/EZ/DA.
-                double csMultiplier = RelaxPpSystemSelection.Current == ForkRelaxPpSystem.MosuPp
-                    ? RxCsPpBuff.Multiplier(beatmap.CircleSize)
-                    : 1.0;
+                // Product of the MosuPp total-PP rules below (1 for MosuRealistik).
+                double mosuPpMultiplier = 1.0;
 
                 if (mosuPp)
                 {
-                    // MosuPp "Low Accuracy Nerf (RX)": below 75% accuracy most of the PP is removed.
-                    csMultiplier *= RxAccuracyNerf.Multiplier(scoreState);
-
-                    // MosuPp "Simple Stream Nerf (RX)": stream maps (speed PP ≥ 1.3–1.65× aim PP) made of straight / one-curve streams lose up to 30%.
-                    csMultiplier *= RxSimpleStreamNerf.Multiplier(beatmap, reference.Final);
+                    // MosuPp "Stream Map Nerf (RX)": stream maps (speed PP ≥ 1.0–1.3× aim PP, ≥ 30–60% stream notes) lose up to 50%.
+                    mosuPpMultiplier *= RxStreamMapNerf.Multiplier(beatmap, reference.Final);
 
                     // MosuPp "Stream-Only Guard (RX)": speed PP ≥ 5–10× aim PP (streams into one point): speed PP stops counting
                     // (none from 10×) and the rest keeps ≤ 10% of the PP.
-                    csMultiplier *= RxStreamOnlyGuard.Apply(result, scoreState, nativeMultiplier, reference.Final);
+                    mosuPpMultiplier *= RxStreamOnlyGuard.Apply(result, scoreState, nativeMultiplier, reference.Final);
 
                     // MosuPp "One-Point Map Guard (RX)": every note stacked on 1–2 spots (e.g. Iyul' [HS]) keeps ~3% of the PP.
-                    csMultiplier *= RxOnePointMapGuard.Multiplier(beatmap);
+                    mosuPpMultiplier *= RxOnePointMapGuard.Multiplier(beatmap);
 
-                    // MosuPp "Short Aim Nerf (RX)": short (≤ 300–700 objects) aim-only maps lose up to 10%.
-                    csMultiplier *= RxShortAimNerf.Multiplier(beatmap, reference.Final);
+                    // MosuPp "Short High CS Nerf (RX)": CS 5–6+ maps with 300–700 objects lose up to 15% (smooth in CS and length).
+                    mosuPpMultiplier *= RxShortHighCsNerf.Multiplier(beatmap);
+
+                    // MosuPp "CS PP Buff (RX)": CS 4 +5%, 5 +10%, 6 +15%, 7 +25%, 8 +50% ... (smooth, CS incl. HR/EZ/DA).
+                    mosuPpMultiplier *= RxCsPpBuff.Multiplier(beatmap.CircleSize);
+
+                    // MosuPp "Heavy Miss Penalty (RX)": every miss above 15 removes another ~10% (× e^(−0.11 · (misses − 15))).
+                    mosuPpMultiplier *= RxHeavyMissPenalty.Multiplier(scoreState.Misses);
                 }
 
                 return new OsuPerformanceAttributes
                 {
-                    Aim = result.PpAim * odMultiplier * patternMultiplier * csMultiplier,
-                    Speed = result.PpSpeed * odMultiplier * csMultiplier,
-                    Accuracy = result.PpAccuracy * odMultiplier * csMultiplier,
-                    Reading = result.PpReading * odMultiplier * csMultiplier,
+                    Aim = result.PpAim * odMultiplier * patternMultiplier * mosuPpMultiplier,
+                    Speed = result.PpSpeed * odMultiplier * mosuPpMultiplier,
+                    Accuracy = result.PpAccuracy * odMultiplier * mosuPpMultiplier,
+                    Reading = result.PpReading * odMultiplier * mosuPpMultiplier,
                     Flashlight = 0,
                     EffectiveMissCount = result.EffectiveMissCount,
-                    Total = result.Pp * odMultiplier * patternMultiplier * csMultiplier,
+                    Total = result.Pp * odMultiplier * patternMultiplier * mosuPpMultiplier,
                 };
             }
             catch (Exception exception) when (exception is not InvalidOperationException)
@@ -224,6 +228,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Relax.MosuPpRelax
             RxAimFocusedFlowGuard.Apply(result, beforeFlowGuard);
             RxLengthBonus.Apply(result);
             RxPointVarietyNerf.Apply(result, beatmap);
+            RxExtremeJumpNerf.Apply(result, beatmap);
 
             if (RealistikRelaxBalance.IsVerticalBalanceEligible(mods))
             {

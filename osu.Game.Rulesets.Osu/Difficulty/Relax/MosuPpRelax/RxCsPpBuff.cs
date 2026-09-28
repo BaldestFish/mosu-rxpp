@@ -11,7 +11,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Relax.MosuPpRelax
     /// (after mods: HR/EZ/DA). The displayed star rating is not affected.
     /// </summary>
     /// <remarks>
-    /// Target growth: CS ≤ 3.5 +0%, CS 4 +10%, CS 5 +20%, CS 6 +30%, CS 7 +50%, CS 8 +100%, CS 9 +200%, CS 10 +400%.
+    /// Target growth (MosuPp version 21, half of the version 6–18 table): CS ≤ 3.5 +0%, CS 4 +5%, CS 5 +10%, CS 6 +15%,
+    /// CS 7 +25%, CS 8 +50%, CS 9 +100%, CS 10 +200%.
     /// Between the points the curve is a monotone cubic (PCHIP), so it is smooth and never overshoots.
     /// Beyond CS 10 (extended DA) the CS 10 value is kept.
     /// A jump-distance multiplier was tried first; with Realistik's own high-CS handling it could not follow
@@ -21,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Relax.MosuPpRelax
     internal static class RxCsPpBuff
     {
         private static readonly double[] cs_points = { 3.5, 4, 5, 6, 7, 8, 9, 10 };
-        private static readonly double[] multiplier_points = { 1.0, 1.1, 1.2, 1.3, 1.5, 2.0, 3.0, 5.0 };
+        private static readonly double[] multiplier_points = { 1.0, 1.05, 1.10, 1.15, 1.25, 1.5, 2.0, 3.0 };
 
         private static readonly double[] slopes = calculateSlopes();
 

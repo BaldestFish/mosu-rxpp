@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Relax.MosuPpRelax
         /// Removes speed PP from the total for stream-only maps (rebuilding the total) and returns the multiplier
         /// for the rest of the total.
         /// </summary>
-        // speedAimRatio: speed PP / aim PP of the SS reference (see MosuPpRelaxCalculator).
+        // speedAimRatio: speed PP / aim PP of the SS reference (see ManagedRealistikRelaxCalculator).
         public static double Apply(RxNativePerformanceResult result, RxScoreState score, double nativeMultiplier, double speedAimRatio)
         {
             double ratio = speedAimRatio;

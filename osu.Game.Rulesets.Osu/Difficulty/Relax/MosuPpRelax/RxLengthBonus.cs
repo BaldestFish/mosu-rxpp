@@ -13,10 +13,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Relax.MosuPpRelax
     /// <remarks>
     /// "Length Bonus (RX)": many hard moments are worth more than one short spike. Realistik's own length bonus
     /// stops growing at 2000 objects and only counts objects; this uses the difficult strain count instead:
-    /// × (1 + 0.60 · smoothstep(DifficultStrainCount, 100, 400)) (was +40% before MosuPp version 6).
+    /// × (1 + 0.20 · smoothstep(DifficultStrainCount, 100, 400)) (+40% before v6, +60% in v6–v15).
     /// <para/>
     /// "Spike Nerf (RX)": maps whose PP comes from one short, extremely hard part (e.g. a short kiai of full-screen
-    /// jumps, the rest easy) lose PP: × (1 − 0.45 · smoothstep(PeakRatio, 1.8, 4.0)), where PeakRatio is the average of
+    /// jumps, the rest easy) lose PP: × (1 − 0.20 · smoothstep(PeakRatio, 1.8, 4.0)) (−45% before v16, −30% in v16–v21), where PeakRatio is the average of
     /// the 10 hardest 400 ms sections divided by the 75th percentile of played sections. Evenly hard maps, short or long,
     /// have a ratio below 1.8 and are not touched.
     /// <para/>
@@ -27,11 +27,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Relax.MosuPpRelax
     /// </remarks>
     internal static class RxLengthBonus
     {
-        public const double MAX_BONUS = 0.60;
+        public const double MAX_BONUS = 0.20;
         public const double COUNT_START = 100;
         public const double COUNT_FULL = 400;
 
-        public const double MAX_SPIKE_NERF = 0.45;
+        public const double MAX_SPIKE_NERF = 0.20;
         public const double PEAK_RATIO_START = 1.8;
         public const double PEAK_RATIO_FULL = 4.0;
 

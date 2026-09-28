@@ -37,7 +37,7 @@ namespace osu.Game.Database
         /// Calculator revision of the MosuPp relax PP system (fields <c>RelaxMosuPp*</c> in <see cref="ForkBeatmapData"/>).
         /// Bump whenever a MosuPp rule changes (see MOSUPP_CHANGELOG.md).
         /// </summary>
-        public const int RELAX_MOSU_PP_PERFORMANCE_CALCULATION_VERSION = 15;
+        public const int RELAX_MOSU_PP_PERFORMANCE_CALCULATION_VERSION = 25;
 
         private readonly Storage storage;
         private readonly ConcurrentDictionary<Guid, double> ppCache = new ConcurrentDictionary<Guid, double>();

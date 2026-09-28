@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Relax.MosuPpRelax
         public const double NOT_AIM_FOCUSED_FROM = 1.1;
         public const double MAX_FLOW_BONUS = 0.17;
 
-        // speedAimRatio: speed PP / aim PP of the SS reference (see MosuPpRelaxCalculator), so the
+        // speedAimRatio: speed PP / aim PP of the SS reference (see ManagedRealistikRelaxCalculator), so the
         // decision does not change with the accuracy or misses of a score.
         public static double AimMultiplier(RxNativePerformanceResult result, double speedAimRatio)
         {

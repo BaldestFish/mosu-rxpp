@@ -147,7 +147,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             [new Mod[] { new OsuModAutoplay() }, 1],
             [new Mod[] { new OsuModCinema() }, 1],
-            [new Mod[] { new OsuModRelax() }, 0.1],
+            [new Mod[] { new OsuModRelax() }, 1], // Mosu: no RX score penalty
             [new Mod[] { new OsuModAutopilot() }, 0.1],
             [new Mod[] { new OsuModSpunOut() }, 0.95],
 
@@ -229,18 +229,22 @@ namespace osu.Game.Rulesets.Osu.Tests
         public void TestMultipliers(Mod[] mods, double expectedMultiplier)
             => TestModCombination(mods, expectedMultiplier);
 
+        // Mosu DA multipliers (beatmap: CS 3, AR 4, OD 5, HP 6).
         [TestCase(null, null, null, null, 1)]
-        [TestCase(2.9f, null, null, null, 0.95)]
-        [TestCase(3.1f, null, null, null, 0.95)]
-        [TestCase(null, 3.9f, null, null, 0.95)]
-        [TestCase(null, 4.1f, null, null, 0.95)]
-        [TestCase(null, null, 4.9f, null, 0.95)]
-        [TestCase(null, null, 5.1f, null, 0.95)]
-        [TestCase(null, null, null, 5.9f, 0.95)]
-        [TestCase(null, null, null, 6.1f, 0.95)]
-        [TestCase(2.9f, 3.9f, null, null, 0.95 * 0.95)]
-        [TestCase(2.9f, 3.9f, 4.9f, null, 0.95 * 0.95 * 0.95)]
-        [TestCase(2.9f, 3.9f, 4.9f, 5.9f, 0.95 * 0.95 * 0.95 * 0.95)]
+        [TestCase(2.9f, null, null, null, 0.97)]
+        [TestCase(3.1f, null, null, null, 1.004)]
+        [TestCase(null, 3.9f, null, null, 0.995)]
+        [TestCase(null, 4.1f, null, null, 0.995)]
+        [TestCase(null, null, 4.9f, null, 0.98)]
+        [TestCase(null, null, 5.1f, null, 1.001)]
+        [TestCase(null, null, null, 5.9f, 1)]
+        [TestCase(null, null, null, 6.1f, 1)]
+        [TestCase(2.9f, 3.9f, null, null, 0.97 * 0.995)]
+        [TestCase(2.9f, 3.9f, 4.9f, null, 0.97 * 0.995 * 0.98)]
+        [TestCase(2.9f, 3.9f, 4.9f, 5.9f, 0.97 * 0.995 * 0.98)]
+        [TestCase(10f, null, null, null, 1.28)]
+        [TestCase(null, 10f, null, null, 0.7)]
+        [TestCase(null, null, 10f, null, 1.05)]
         [TestCase(0.0f, null, null, null, 0.1)]
         [TestCase(0.0f, 0.0f, 0.0f, 0.0f, 0.1)]
         public void TestDifficultyAdjust(float? cs, float? ar, float? od, float? hp, double expectedMultiplier)
